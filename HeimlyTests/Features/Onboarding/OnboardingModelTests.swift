@@ -20,7 +20,6 @@ struct OnboardingModelTests {
         )
         
         #expect(model.step == .serverConnection)
-        #expect(model.serverURL == nil)
     }
     
     @Test
@@ -36,8 +35,7 @@ struct OnboardingModelTests {
             serverURLStore: store
         )
 
-        #expect(model.step == .authentication)
-        #expect(model.serverURL == storedURL)
+        #expect(model.step == .authentication(serverURL: storedURL))
     }
     
     @Test
@@ -54,7 +52,6 @@ struct OnboardingModelTests {
         model.didConnect(to: connectedURL)
 
         #expect(store.serverURL == connectedURL)
-        #expect(model.serverURL == connectedURL)
-        #expect(model.step == .authentication)
+        #expect(model.step == .authentication(serverURL: connectedURL))
     }
 }

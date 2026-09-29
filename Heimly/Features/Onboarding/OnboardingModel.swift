@@ -12,11 +12,10 @@ import Foundation
 final class OnboardingModel {
     enum Step: Equatable {
         case serverConnection
-        case authentication
+        case authentication(serverURL: URL)
     }
     
     private(set) var step: Step
-    private(set) var serverURL: URL?
     
     private let serverURLStore: any ServerURLStoring
     
@@ -26,17 +25,24 @@ final class OnboardingModel {
     ) {
         self.serverURLStore = serverURLStore
         
-        let storedServerURL = serverURLStore.serverURL
-        serverURL = storedServerURL
-        step = storedServerURL == nil
-            ? .serverConnection
-            : .authentication
+        if let storedServerURL = serverURLStore.serverURL {
+            step = .authentication(
+                serverURL: storedServerURL
+            )
+        } else {
+            step = .serverConnection
+        }
     }
     
     func didConnect(to serverURL: URL) {
         serverURLStore.save(serverURL)
 
-        self.serverURL = serverURL
-        step = .authentication
+        step = .authentication(serverURL: serverURL)
+    }
+    
+    func chooseAnotherServer() {
+        serverURLStore.remove()
+        
+        step = .serverConnection
     }
 }
