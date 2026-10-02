@@ -16,14 +16,23 @@ struct OnboardingView: View {
             ServerConnectView { serverURL in
                 model.didConnect(to: serverURL)
             }
-        case .authentication(let serverURL):
-            VStack(
-                spacing: 8
-            ) {
+        case .authentication:
+            if let authenticationModel = model.authenticationModel {
+                AuthenticationView(
+                    model: authenticationModel,
+                    onAuthenticated: { userID in
+                        model.didAuthenticate(userID: userID)
+                    },
+                    onChangeServer: {
+                        model.chooseAnotherServer()
+                    }
+                )
+            }
+        case .householdSelection(let serverURL, let userID):
+            VStack(spacing: 8) {
+                Text(verbatim: "Household selection")
                 Text(verbatim: serverURL.absoluteString)
-                Button("Change server") {
-                    model.chooseAnotherServer()
-                }
+                Text(verbatim: userID.uuidString)
             }
         }
     }

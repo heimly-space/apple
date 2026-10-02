@@ -39,6 +39,32 @@ struct OnboardingModelTests {
     }
     
     @Test
+    func advancesFromAuthenticationToHouseholdSelection() throws {
+        let serverURL = try #require(
+            URL(string: "https://example.heimly.space")
+        )
+        let userID = UUID()
+        let model = OnboardingModel(
+            serverURLStore: MockServerURLStore(
+                serverURL: serverURL
+            )
+        )
+
+        #expect(model.authenticationModel != nil)
+
+        model.didAuthenticate(userID: userID)
+
+        #expect(
+            model.step
+                == .householdSelection(
+                    serverURL: serverURL,
+                    userID: userID
+                )
+        )
+        #expect(model.authenticationModel == nil)
+    }
+
+    @Test
     func savesConnectedServerAndAdvancesToAuthentication() throws {
         let store = MockServerURLStore()
         let model = OnboardingModel(
